@@ -1,0 +1,479 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@300;400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --navy:#0D1B2A;--blue:#1A73E8;--blue-light:#E8F1FE;--teal:#00BFA5;--teal-light:#E0F7F4;
+    --coral:#FF6B6B;--gold:#F5A623;--neutral-50:#F8F9FA;--neutral-100:#F1F3F5;
+    --neutral-200:#DEE2E6;--neutral-400:#868E96;--neutral-700:#343A40;--neutral-900:#212529;
+    --white:#FFFFFF;--shadow:0 2px 12px rgba(13,27,42,0.08);
+  }
+  body{font-family:'DM Sans',sans-serif;color:var(--neutral-900);background:transparent;font-size:15px;line-height:1.6}
+  h1,h2,h3,h4{font-family:'Playfair Display',serif}
+
+  .tab-bar{display:flex;gap:0;border-bottom:1.5px solid var(--neutral-200);margin-bottom:0;background:var(--white);border-radius:12px 12px 0 0;overflow:hidden}
+  .tab{padding:12px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--neutral-400);transition:all 0.2s;border-bottom:2px solid transparent;font-family:'DM Sans',sans-serif}
+  .tab.active{color:var(--blue);border-bottom:2px solid var(--blue);background:var(--blue-light)}
+  .tab:hover:not(.active){color:var(--neutral-700);background:var(--neutral-50)}
+
+  .panel{display:none;padding:24px;background:var(--white);border-radius:0 0 12px 12px;border:0.5px solid var(--neutral-200);border-top:none}
+  .panel.active{display:block}
+
+  /* === PANEL 1: HEURISTIC === */
+  .section-label{font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--neutral-400);margin-bottom:14px}
+  .heuristic-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .h-card{background:var(--neutral-50);border-radius:10px;padding:14px 16px;border-left:3px solid var(--coral)}
+  .h-card.ok{border-left-color:var(--teal)}
+  .h-card.warn{border-left-color:var(--gold)}
+  .h-card h4{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--neutral-900);margin-bottom:4px}
+  .h-card p{font-size:12px;color:var(--neutral-400);line-height:1.5}
+  .badge{display:inline-block;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;margin-bottom:6px}
+  .badge.issue{background:#FFF0EE;color:#C0392B}
+  .badge.ok{background:var(--teal-light);color:#00796B}
+  .badge.warn{background:#FFF8E1;color:#E65100}
+  .nielsen-ref{font-size:11px;color:var(--blue);margin-top:4px;font-style:italic}
+
+  /* === PANEL 2: STYLE GUIDE === */
+  .style-section{margin-bottom:24px}
+  .color-row{display:flex;gap:8px;flex-wrap:wrap}
+  .color-chip{width:64px;text-align:center}
+  .chip-swatch{height:44px;border-radius:8px;margin-bottom:6px;border:0.5px solid var(--neutral-200)}
+  .chip-label{font-size:10px;color:var(--neutral-400);line-height:1.3}
+  .chip-hex{font-size:10px;font-weight:500;color:var(--neutral-700);font-family:monospace}
+  .type-sample{margin-bottom:12px;padding:12px;background:var(--neutral-50);border-radius:8px}
+  .font-display{font-family:'Playfair Display',serif;font-size:26px;font-weight:500;color:var(--navy)}
+  .font-body{font-family:'DM Sans',sans-serif;font-size:15px;color:var(--neutral-700);line-height:1.7}
+  .font-meta{font-size:11px;color:var(--neutral-400);margin-top:4px}
+  .component-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px;background:var(--neutral-50);border-radius:8px}
+  .btn-primary{background:var(--blue);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+  .btn-secondary{background:transparent;color:var(--blue);border:1.5px solid var(--blue);padding:9px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+  .btn-ghost{background:transparent;color:var(--neutral-700);border:1px solid var(--neutral-200);padding:9px 20px;border-radius:8px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif}
+  .tag{display:inline-block;background:var(--blue-light);color:var(--blue);font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500}
+  .tag.success{background:var(--teal-light);color:#00796B}
+  .tag.warning{background:#FFF8E1;color:#E65100}
+
+  /* === PANEL 3: WIREFRAME === */
+  .wireframe-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .wf-box{background:var(--neutral-50);border:1.5px dashed var(--neutral-200);border-radius:10px;padding:14px;font-size:12px;color:var(--neutral-400)}
+  .wf-box h4{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--neutral-700);margin-bottom:8px;font-weight:500}
+  .wf-item{background:var(--neutral-200);height:10px;border-radius:3px;margin-bottom:6px;opacity:0.7}
+  .wf-item.tall{height:40px}
+  .wf-item.btn{height:32px;background:var(--blue);opacity:0.3;border-radius:6px;width:80px}
+  .wf-item.hero{height:70px;background:linear-gradient(90deg,var(--neutral-200) 60%,var(--neutral-100) 100%)}
+  .wf-item.w60{width:60%}
+  .wf-item.w40{width:40%}
+  .wf-item.w80{width:80%}
+  .flow-list{counter-reset:flow;margin-top:0}
+  .flow-item{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
+  .flow-num{min-width:26px;height:26px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;margin-top:2px}
+  .flow-text h4{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--neutral-900);margin-bottom:2px}
+  .flow-text p{font-size:12px;color:var(--neutral-400)}
+
+  /* === PANEL 4: HIFI MOCKUP === */
+  .mockup-frame{background:var(--neutral-100);border-radius:12px;padding:16px;border:0.5px solid var(--neutral-200)}
+  .mock-nav{background:var(--white);border-radius:8px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border:0.5px solid var(--neutral-200)}
+  .mock-logo{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--navy)}
+  .mock-links{display:flex;gap:16px}
+  .mock-link{font-size:12px;color:var(--neutral-400)}
+  .mock-hero{background:linear-gradient(135deg,var(--navy) 0%,#1a3a5c 100%);border-radius:10px;padding:24px 20px;color:#fff;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+  .mock-hero-text h2{font-size:18px;font-weight:500;margin-bottom:6px;line-height:1.3}
+  .mock-hero-text p{font-size:12px;opacity:0.75;margin-bottom:14px}
+  .mock-hero-badge{background:rgba(0,191,165,0.15);border:1px solid var(--teal);color:var(--teal);font-size:10px;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:10px;font-weight:500}
+  .mock-cta{background:var(--teal);color:#fff;border:none;padding:9px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+  .mock-tasks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mock-task-card{background:var(--white);border-radius:10px;padding:14px;border:0.5px solid var(--neutral-200)}
+  .mock-task-card .task-num{font-size:22px;font-weight:500;color:var(--neutral-200);font-family:'Playfair Display',serif;line-height:1}
+  .mock-task-card h4{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;margin:6px 0 4px;color:var(--neutral-900)}
+  .mock-task-card p{font-size:11px;color:var(--neutral-400);margin-bottom:10px}
+  .task-meta{display:flex;justify-content:space-between;align-items:center}
+  .task-due{font-size:10px;color:var(--neutral-400)}
+  .task-days{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px}
+  .task-days.urgent{background:#FFF0EE;color:#C0392B}
+  .task-days.ok{background:var(--teal-light);color:#00796B}
+  .task-days.soon{background:#FFF8E1;color:#E65100}
+  .progress-bar{height:3px;background:var(--neutral-100);border-radius:2px;margin-top:10px;overflow:hidden}
+  .progress-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--teal))}
+  .mock-sbtn{width:100%;background:var(--blue);color:#fff;border:none;padding:9px;border-radius:7px;font-size:11px;font-weight:500;cursor:pointer;margin-top:12px;font-family:'DM Sans',sans-serif}
+
+  /* === PANEL 5: RESPONSIVE === */
+  .resp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .resp-device{text-align:center}
+  .device-frame{border:2px solid var(--neutral-300,#ccc);border-radius:10px;margin:0 auto 8px;overflow:hidden;background:var(--neutral-50)}
+  .device-screen{background:var(--white);padding:8px;font-size:9px}
+  .screen-nav{background:var(--navy);color:#fff;padding:4px 6px;border-radius:4px;font-size:8px;margin-bottom:4px}
+  .screen-block{background:var(--neutral-100);border-radius:3px;height:14px;margin-bottom:3px}
+  .screen-block.blue{background:var(--blue);opacity:0.3}
+  .screen-block.half{width:50%}
+  .screen-block.third{width:33%}
+  .screen-cards-row{display:flex;gap:3px}
+  .screen-card-sm{background:var(--neutral-100);border-radius:3px;height:22px;flex:1}
+  .device-label{font-size:11px;font-weight:500;color:var(--neutral-700)}
+  .device-sub{font-size:10px;color:var(--neutral-400)}
+  .resp-detail{margin-top:16px}
+  .resp-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+  .resp-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .resp-icon.m{background:var(--blue-light)}
+  .resp-icon.t{background:var(--teal-light)}
+  .resp-icon.d{background:#F3E5F5}
+  .resp-text h4{font-size:13px;font-weight:500;color:var(--neutral-900);margin-bottom:2px;font-family:'DM Sans',sans-serif}
+  .resp-text p{font-size:12px;color:var(--neutral-400);line-height:1.5}
+
+  /* === PANEL 6: DELIVERABLES === */
+  .case-flow{margin-bottom:20px}
+  .case-step{display:flex;gap:14px;align-items:flex-start;margin-bottom:0}
+  .case-step-line{display:flex;flex-direction:column;align-items:center;gap:0}
+  .case-dot{width:14px;height:14px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:3px}
+  .case-dot.coral{background:var(--coral)}
+  .case-dot.teal{background:var(--teal)}
+  .case-connector{width:2px;flex:1;min-height:24px;background:var(--neutral-200)}
+  .case-content{padding-bottom:20px}
+  .case-content h4{font-size:13px;font-weight:500;color:var(--neutral-900);margin-bottom:3px;font-family:'DM Sans',sans-serif}
+  .case-content p{font-size:12px;color:var(--neutral-400);line-height:1.6}
+  .deliverable-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .del-chip{background:var(--neutral-50);border:0.5px solid var(--neutral-200);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--neutral-700)}
+  .del-chip span{display:block;font-size:10px;color:var(--neutral-400);margin-top:1px}
+</style>
+
+<h2 style="sr-only">Website UI Redesign — Full Case Study</h2>
+
+<div class="tab-bar" id="tabs">
+  <button class="tab active" data-tab="0">Heuristics</button>
+  <button class="tab" data-tab="1">Style Guide</button>
+  <button class="tab" data-tab="2">Wireframe</button>
+  <button class="tab" data-tab="3">Hi-Fi UI</button>
+  <button class="tab" data-tab="4">Responsive</button>
+  <button class="tab" data-tab="5">Case Study</button>
+</div>
+
+<!-- PANEL 0: HEURISTICS -->
+<div class="panel active" id="panel-0">
+  <p class="section-label">Nielsen's 10 Heuristics — Evaluation</p>
+  <div class="heuristic-grid">
+    <div class="h-card">
+      <span class="badge issue">Issue</span>
+      <h4>Visibility of system status</h4>
+      <p>No progress indicator for task submissions. Users don't know if their work was received.</p>
+      <div class="nielsen-ref">Heuristic #1</div>
+    </div>
+    <div class="h-card">
+      <span class="badge issue">Issue</span>
+      <h4>User control & freedom</h4>
+      <p>Modal has no keyboard escape or accessible close. Users feel trapped once Submit is clicked.</p>
+      <div class="nielsen-ref">Heuristic #3</div>
+    </div>
+    <div class="h-card">
+      <span class="badge issue">Issue</span>
+      <h4>Aesthetic & minimalist design</h4>
+      <p>Cards show all details at once — overwhelming for first-time users. No progressive disclosure.</p>
+      <div class="nielsen-ref">Heuristic #8</div>
+    </div>
+    <div class="h-card warn">
+      <span class="badge warn">Warning</span>
+      <h4>Recognition over recall</h4>
+      <p>Due dates listed but no visual urgency cues (color coding) to distinguish urgent vs safe tasks.</p>
+      <div class="nielsen-ref">Heuristic #6</div>
+    </div>
+    <div class="h-card warn">
+      <span class="badge warn">Warning</span>
+      <h4>Consistency & standards</h4>
+      <p>Button styles mix filled/flat inconsistently. "Submit Work" appears twice with same weight.</p>
+      <div class="nielsen-ref">Heuristic #4</div>
+    </div>
+    <div class="h-card ok">
+      <span class="badge ok">Good</span>
+      <h4>Error prevention</h4>
+      <p>Submission modal confirms intent before sending — good pattern, just needs better styling.</p>
+      <div class="nielsen-ref">Heuristic #5</div>
+    </div>
+    <div class="h-card">
+      <span class="badge issue">Issue</span>
+      <h4>Accessibility</h4>
+      <p>Low contrast on muted badge text. Missing ARIA labels on buttons. No focus ring visible.</p>
+      <div class="nielsen-ref">WCAG 2.1 AA</div>
+    </div>
+    <div class="h-card warn">
+      <span class="badge warn">Warning</span>
+      <h4>Flexibility & efficiency</h4>
+      <p>No quick filters for "Due soon" or "Available". Power users must scroll through all tasks.</p>
+      <div class="nielsen-ref">Heuristic #7</div>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 1: STYLE GUIDE -->
+<div class="panel" id="panel-1">
+  <div class="style-section">
+    <p class="section-label">Color palette</p>
+    <div class="color-row">
+      <div class="color-chip"><div class="chip-swatch" style="background:#0D1B2A"></div><div class="chip-label">Navy</div><div class="chip-hex">#0D1B2A</div></div>
+      <div class="color-chip"><div class="chip-swatch" style="background:#1A73E8"></div><div class="chip-label">Primary</div><div class="chip-hex">#1A73E8</div></div>
+      <div class="color-chip"><div class="chip-swatch" style="background:#E8F1FE"></div><div class="chip-label">Blue tint</div><div class="chip-hex">#E8F1FE</div></div>
+      <div class="color-chip"><div class="chip-swatch" style="background:#00BFA5"></div><div class="chip-label">Teal</div><div class="chip-hex">#00BFA5</div></div>
+      <div class="color-chip"><div class="chip-swatch" style="background:#FF6B6B"></div><div class="chip-label">Coral</div><div class="chip-hex">#FF6B6B</div></div>
+      <div class="color-chip"><div class="chip-swatch" style="background:#F5A623"></div><div class="chip-label">Amber</div><div class="chip-hex">#F5A623</div></div>
+      <div class="color-chip"><div class="chip-swatch" style="background:#F8F9FA"></div><div class="chip-label">Surface</div><div class="chip-hex">#F8F9FA</div></div>
+      <div class="color-chip"><div class="chip-swatch" style="background:#343A40"></div><div class="chip-label">Text</div><div class="chip-hex">#343A40</div></div>
+    </div>
+  </div>
+  <div class="style-section">
+    <p class="section-label">Typography pairing</p>
+    <div class="type-sample">
+      <div class="font-display">Playfair Display — Headings</div>
+      <div class="font-meta">500 weight · Display titles, section headers</div>
+    </div>
+    <div class="type-sample">
+      <div class="font-body">DM Sans — Body & UI copy. Clean, modern humanist sans-serif with excellent readability at small sizes.</div>
+      <div class="font-meta">300/400/500 weight · Body, labels, metadata</div>
+    </div>
+  </div>
+  <div class="style-section">
+    <p class="section-label">UI components</p>
+    <div class="component-row">
+      <button class="btn-primary">Submit work</button>
+      <button class="btn-secondary">View details</button>
+      <button class="btn-ghost">Cancel</button>
+      <span class="tag">Available</span>
+      <span class="tag success">Submitted</span>
+      <span class="tag warning">Due soon</span>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 2: WIREFRAME -->
+<div class="panel" id="panel-2">
+  <p class="section-label">Low-fidelity layout plan</p>
+  <div class="wireframe-grid">
+    <div class="wf-box">
+      <h4>Top navigation bar</h4>
+      <div class="wf-item w60"></div>
+      <div style="display:flex;gap:8px;margin-top:6px"><div class="wf-item w40" style="height:8px"></div><div class="wf-item" style="height:8px;width:30px;background:var(--blue);opacity:0.25;border-radius:4px"></div></div>
+      <p style="margin-top:8px">Logo left · Nav links center · Avatar/CTA right</p>
+    </div>
+    <div class="wf-box">
+      <h4>Hero banner</h4>
+      <div class="wf-item hero"></div>
+      <p style="margin-top:8px">Welcome message + progress stats</p>
+    </div>
+    <div class="wf-box">
+      <h4>Task filter strip</h4>
+      <div style="display:flex;gap:6px"><div class="wf-item" style="width:50px;height:20px;border-radius:12px"></div><div class="wf-item" style="width:60px;height:20px;border-radius:12px"></div><div class="wf-item" style="width:55px;height:20px;border-radius:12px"></div></div>
+      <p style="margin-top:8px">All · Available · Submitted · Overdue</p>
+    </div>
+    <div class="wf-box">
+      <h4>Task cards (grid)</h4>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div class="wf-item tall"></div><div class="wf-item tall"></div>
+      </div>
+      <p style="margin-top:8px">2-col on desktop · 1-col on mobile</p>
+    </div>
+  </div>
+  <div style="margin-top:20px">
+    <p class="section-label">Information architecture flow</p>
+    <div class="flow-list">
+      <div class="flow-item"><div class="flow-num">1</div><div class="flow-text"><h4>Dashboard entry</h4><p>Student lands on dashboard with personalized greeting + completion stats.</p></div></div>
+      <div class="flow-item"><div class="flow-num">2</div><div class="flow-text"><h4>Task discovery</h4><p>Filter strip narrows tasks. Cards show title, due date, urgency badge.</p></div></div>
+      <div class="flow-item"><div class="flow-num">3</div><div class="flow-text"><h4>Task expansion</h4><p>Click card → details expand inline (accordion) showing key features + outcome.</p></div></div>
+      <div class="flow-item"><div class="flow-num">4</div><div class="flow-text"><h4>Submission</h4><p>Submit button opens modal with URL input + confirmation. Toast confirms success.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 3: HIFI MOCKUP -->
+<div class="panel" id="panel-3">
+  <p class="section-label">High-fidelity mockup preview</p>
+  <div class="mockup-frame">
+    <div class="mock-nav">
+      <div class="mock-logo">Thiranex</div>
+      <div class="mock-links">
+        <span class="mock-link">Dashboard</span>
+        <span class="mock-link">Tasks</span>
+        <span class="mock-link">Progress</span>
+      </div>
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:500">S</div>
+    </div>
+    <div class="mock-hero">
+      <div class="mock-hero-text">
+        <div class="mock-hero-badge">3 tasks available</div>
+        <h2>Welcome back, Student</h2>
+        <p>You're making great progress. Keep it up!</p>
+        <button class="mock-cta">View all tasks</button>
+      </div>
+      <div style="text-align:right;opacity:0.6">
+        <div style="font-size:32px;font-family:'Playfair Display',serif;color:#fff">2/5</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.6)">tasks done</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:12px">
+      <span style="font-size:11px;padding:5px 12px;border-radius:20px;background:var(--blue);color:#fff;cursor:pointer">All</span>
+      <span style="font-size:11px;padding:5px 12px;border-radius:20px;background:var(--neutral-100);color:var(--neutral-400);cursor:pointer">Available</span>
+      <span style="font-size:11px;padding:5px 12px;border-radius:20px;background:var(--neutral-100);color:var(--neutral-400);cursor:pointer">Submitted</span>
+    </div>
+    <div class="mock-tasks">
+      <div class="mock-task-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div class="task-num">01</div>
+          <span class="tag success" style="font-size:9px">Submitted</span>
+        </div>
+        <h4>Portfolio Website</h4>
+        <p>Build a personal portfolio using HTML/CSS/JS with responsive design.</p>
+        <div class="task-meta">
+          <span class="task-due">25 Apr 2026</span>
+          <span class="task-days ok">Done</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+      </div>
+      <div class="mock-task-card" style="border:1.5px solid var(--blue)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div class="task-num" style="color:var(--blue);opacity:1">02</div>
+          <span class="tag" style="font-size:9px">Available</span>
+        </div>
+        <h4>Website UI Redesign</h4>
+        <p>Redesign the UI of an existing site to improve usability.</p>
+        <div class="task-meta">
+          <span class="task-due">30 Apr 2026</span>
+          <span class="task-days soon">12 days</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:45%"></div></div>
+        <button class="mock-sbtn">Submit work →</button>
+      </div>
+      <div class="mock-task-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div class="task-num">03</div>
+          <span class="tag" style="font-size:9px">Available</span>
+        </div>
+        <h4>JavaScript App</h4>
+        <p>Build an interactive app using vanilla JS and DOM manipulation.</p>
+        <div class="task-meta">
+          <span class="task-due">07 May 2026</span>
+          <span class="task-days ok">19 days</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:10%"></div></div>
+      </div>
+      <div class="mock-task-card" style="background:var(--neutral-50);display:flex;align-items:center;justify-content:center;min-height:140px;border-style:dashed">
+        <div style="text-align:center;color:var(--neutral-400)">
+          <div style="font-size:22px;margin-bottom:4px">+</div>
+          <div style="font-size:11px">More tasks coming</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 4: RESPONSIVE -->
+<div class="panel" id="panel-4">
+  <p class="section-label">Responsive breakpoints</p>
+  <div class="resp-grid">
+    <div class="resp-device">
+      <div class="device-frame" style="width:80px;height:140px;border-radius:12px">
+        <div class="device-screen">
+          <div class="screen-nav">Thiranex</div>
+          <div class="screen-block blue"></div>
+          <div class="screen-block"></div>
+          <div class="screen-block half"></div>
+          <div class="screen-cards-row" style="margin-top:4px">
+            <div class="screen-card-sm"></div>
+          </div>
+          <div class="screen-cards-row" style="margin-top:3px">
+            <div class="screen-card-sm"></div>
+          </div>
+        </div>
+      </div>
+      <div class="device-label">Mobile</div>
+      <div class="device-sub">&lt; 640px</div>
+    </div>
+    <div class="resp-device">
+      <div class="device-frame" style="width:120px;height:140px;border-radius:10px">
+        <div class="device-screen">
+          <div class="screen-nav">Thiranex</div>
+          <div class="screen-block blue"></div>
+          <div class="screen-cards-row" style="margin-top:4px">
+            <div class="screen-card-sm"></div>
+            <div class="screen-card-sm"></div>
+          </div>
+          <div class="screen-cards-row" style="margin-top:3px">
+            <div class="screen-card-sm"></div>
+            <div class="screen-card-sm"></div>
+          </div>
+        </div>
+      </div>
+      <div class="device-label">Tablet</div>
+      <div class="device-sub">640–1024px</div>
+    </div>
+    <div class="resp-device">
+      <div class="device-frame" style="width:160px;height:120px;border-radius:6px">
+        <div class="device-screen">
+          <div class="screen-nav" style="display:flex;justify-content:space-between"><span>Thiranex</span><span style="font-size:6px;opacity:0.6">Nav · Nav · Nav</span></div>
+          <div style="display:flex;gap:3px;margin-top:3px">
+            <div class="screen-block blue" style="flex:1;height:30px;border-radius:3px"></div>
+          </div>
+          <div class="screen-cards-row" style="margin-top:4px">
+            <div class="screen-card-sm"></div>
+            <div class="screen-card-sm"></div>
+            <div class="screen-card-sm"></div>
+          </div>
+        </div>
+      </div>
+      <div class="device-label">Desktop</div>
+      <div class="device-sub">&gt; 1024px</div>
+    </div>
+  </div>
+  <div class="resp-detail">
+    <div class="resp-row">
+      <div class="resp-icon m">📱</div>
+      <div class="resp-text"><h4>Mobile (&lt;640px)</h4><p>Hamburger menu · Single column task cards · Sticky bottom submit button · Large touch targets (44px min)</p></div>
+    </div>
+    <div class="resp-row">
+      <div class="resp-icon t">📟</div>
+      <div class="resp-text"><h4>Tablet (640–1024px)</h4><p>Collapsible sidebar · 2-column task grid · Side-by-side hero stats · Filter bar horizontal scroll</p></div>
+    </div>
+    <div class="resp-row">
+      <div class="resp-icon d">🖥</div>
+      <div class="resp-text"><h4>Desktop (&gt;1024px)</h4><p>Full nav bar · 3-column task grid · Sidebar progress panel · Hover states on cards · Keyboard nav support</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 5: CASE STUDY -->
+<div class="panel" id="panel-5">
+  <p class="section-label">Case study — problem → solution → result</p>
+  <div class="case-flow">
+    <div class="case-step">
+      <div class="case-step-line"><div class="case-dot coral"></div><div class="case-connector"></div></div>
+      <div class="case-content"><h4>Problem</h4><p>The Thiranex student portal suffered from poor visual hierarchy, lack of urgency signaling, inaccessible modals, and no progressive disclosure — leading to cognitive overload for beginner users unsure of where to focus next.</p></div>
+    </div>
+    <div class="case-step">
+      <div class="case-step-line"><div class="case-dot"></div><div class="case-connector"></div></div>
+      <div class="case-content"><h4>Research</h4><p>Evaluated the UI against Nielsen's 10 heuristics. Identified 4 critical issues (system status, user control, aesthetics, accessibility) and 3 warnings (consistency, recognition, flexibility).</p></div>
+    </div>
+    <div class="case-step">
+      <div class="case-step-line"><div class="case-dot"></div><div class="case-connector"></div></div>
+      <div class="case-content"><h4>Design decisions</h4><p>Chose a navy + blue + teal palette for trust and clarity. Playfair Display for authority; DM Sans for readability. Introduced urgency color coding (coral/amber/teal badges), a hero progress banner, and accordion task cards to reduce visual clutter.</p></div>
+    </div>
+    <div class="case-step">
+      <div class="case-step-line"><div class="case-dot teal"></div></div>
+      <div class="case-content"><h4>Result</h4><p>A cleaner, accessible, responsive student portal with clear information hierarchy, visual urgency, and delightful micro-interactions — ready for Figma handoff or HTML/CSS implementation.</p></div>
+    </div>
+  </div>
+  <p class="section-label" style="margin-top:4px">Deliverables checklist</p>
+  <div class="deliverable-chips">
+    <div class="del-chip">Heuristic evaluation<span>8 issues mapped to Nielsen's principles</span></div>
+    <div class="del-chip">Color palette<span>8 tokens with hex codes</span></div>
+    <div class="del-chip">Typography system<span>Playfair Display + DM Sans</span></div>
+    <div class="del-chip">UI components<span>Buttons, badges, cards, modals</span></div>
+    <div class="del-chip">Wireframe plan<span>4 layout zones + IA flow</span></div>
+    <div class="del-chip">Hi-fi mockup<span>Interactive preview above</span></div>
+    <div class="del-chip">Responsive guide<span>Mobile / Tablet / Desktop specs</span></div>
+    <div class="del-chip">Case study<span>Problem → solution → result</span></div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+</script>
